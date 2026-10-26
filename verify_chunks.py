@@ -1,3 +1,4 @@
+#to verify the chunks count equal to rows in DB and preview top k rows
 import os
 import psycopg
 from dotenv import load_dotenv

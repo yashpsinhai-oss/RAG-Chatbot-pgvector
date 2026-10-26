@@ -1,3 +1,4 @@
+#load,clean,embed,chunk,store
 from chunk_PC11 import load_document,clean_text,chunk_text,chunk_words,DOC_PATH
 from embed_demo_v3_PC9 import get_embeddings_batch
 import psycopg
