@@ -1,3 +1,4 @@
+#connecting an embedding model
 import os
 from dotenv import load_dotenv
 from google import genai # the SDK package is google-genai, but you import it as google.genai

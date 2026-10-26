@@ -1,3 +1,4 @@
+#wrapping the embedding code in a function and defining cosine similarity function
 import os
 from dotenv import load_dotenv
 from google import genai # the SDK package is google-genai, but you import it as google.genai

@@ -1,3 +1,4 @@
+#error handling, query as user input, embedding sentence and query , then comparing similarity,score, rank in sorted order
 import os
 import sys
 from dotenv import load_dotenv
@@ -23,6 +24,47 @@ def get_embedding(text):
     vector=result.embeddings[0].values # one embedding per input, in the same order; .values is the list of floats    
 
     return vector
+
+#without batch
+def get_embeddings(texts):
+    result = client.models.embed_content(
+        model="gemini-embedding-001", # the embedding model we chose
+        contents=texts, # a string, or a list of strings to embed several at once
+        config=types.EmbedContentConfig(
+            output_dimensionality=768, # shrink the vector from the 3072 default to 768-dimension vector
+        )
+    )
+
+    if not result.embeddings:                                  # guard: None or empty means the call returned nothing
+        raise ValueError("No embeddings returned") 
+    
+    vector=result.embeddings[0].values # one embedding per input, in the same order; .values is the list of floats    
+
+    return vector
+
+#with batch
+#is the same stride idea as your chunker, without the overlap
+#one call could do it, but batching keeps you safe as documents grow
+def get_embeddings_batch(texts,batch_size=10):
+    vectors=[]
+
+    for i in range(0,len(texts),batch_size):
+        batch=texts[i:i+batch_size]
+        
+        result = client.models.embed_content(
+            model="gemini-embedding-001", # the embedding model we chose
+            contents=batch, # a string, or a list of strings to embed several at once in batches
+            config=types.EmbedContentConfig(
+                output_dimensionality=768, # shrink the vector from the 3072 default to 768-dimension vector
+            )
+        )
+
+        if not result.embeddings  or len(result.embeddings)!=len(batch):
+            raise ValueError("Embedding count does not match the batch size")  
+
+        vectors.extend(e.values for e in result.embeddings)
+
+    return vectors    
 
 def cosine_similarity(vec1, vec2):
     """Compute the cosine similarity between two vectors."""

@@ -15,7 +15,7 @@ if __name__=="__main__":
         print(row)
         conn.execute("CREATE EXTENSION IF NOT EXISTS vector;")
         result=conn.execute("SELECT extversion FROM pg_extension WHERE extname = 'vector';").fetchone()
-        if result is None:
+        if not result:
             raise TypeError("Extensions are not installed")
         print(result)
         conn.execute("CREATE TABLE IF NOT EXISTS items(id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,content TEXT NOT NULL,embedding VECTOR(768))")
