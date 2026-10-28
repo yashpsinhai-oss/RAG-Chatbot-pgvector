@@ -1,6 +1,6 @@
 #load,clean,embed,chunk,store
-from chunk_PC11 import load_document,clean_text,chunk_text,chunk_words,DOC_PATH
-from embed_demo_v3_PC9 import get_embeddings_batch
+from chunking import load_document,clean_text,chunk_text,chunk_words,DOC_PATH,prepare_text
+from embeddings import get_embeddings_batch
 import psycopg
 from dotenv import  load_dotenv
 import os
@@ -8,8 +8,7 @@ source = os.path.basename(DOC_PATH)                    # just "jwt_notes.pdf", s
 
 load_dotenv
 if __name__=="__main__":
-    text=load_document(DOC_PATH)
-    text=clean_text(text)
+    text=prepare_text(DOC_PATH,"1. Why JWT")
     chunks=chunk_words(text)
     vectors=get_embeddings_batch(chunks,10)
     

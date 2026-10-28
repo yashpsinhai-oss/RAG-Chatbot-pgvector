@@ -2,7 +2,7 @@
 import psycopg
 import os
 
-from embed_demo_v3_PC9 import get_embedding
+from embeddings import get_embedding
 
 from dotenv import load_dotenv
 load_dotenv()

@@ -2,7 +2,7 @@
 import os
 import psycopg
 from dotenv import load_dotenv
-from injest_PC11 import source
+from ingestion import source
 load_dotenv()
 with psycopg.connect(os.getenv("DATABASE_URL")) as conn:
     #count row
