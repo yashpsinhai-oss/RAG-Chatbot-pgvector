@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from dotenv import load_dotenv
 from groq import Groq
@@ -23,10 +24,10 @@ for reference_num, (source,i,content,distance) in enumerate(result,start=1):
         Content: {content}
     """
     combine_chunks.append(attribution)
-    # print(content) #for debugging
+    print(f"({source},{i},{content},{distance})") #for debugging
 
 join_text="\n".join(combine_chunks)
-print(join_text) #for debugging the output of join_text after the strimg attribution changes whether each chunk has correct reference number and corresponding chunk index
+print(join_text) #for debugging the output of join_text after the string attribution changes whether each chunk has correct reference number and corresponding chunk index
 prompt = f"""
     INSTRUCTIONS:
 
@@ -69,7 +70,40 @@ response=client.chat.completions.create(
     model="openai/gpt-oss-120b",
     messages=[{"role": "user", "content": prompt}]
 )
-print(response.choices[0].message.content)
+answer=response.choices[0].message.content
+print("ANSWER TYPE:", type(answer))
+print("ANSWER CONTAINS [1]:", "[1]" in answer)
+print("ANSWER CONTAINS [1, 2, 3]:", "[1, 2, 3]" in answer)
+print("ANSWER END:", repr(answer[-200:]))
+print(answer)
+#now citation validation step-1 (reference id validation-matching whether all the citation num generated in answer is from the Retrieved Reference Numbers section)
+citation = re.findall(r"\[(\d+(?:\s*,\s*\d+)*)\]", answer)
+#now split the group citation
+# unique_citation=list(sorted(set(map(int,citation))))
+# citation=[num for group in citation for num in group.split(",")]
+citation = [
+    num.strip()
+    for group in citation
+    for num in group.split(",")
+]
+unique_citation = sorted(set(map(int, citation)))
+# print(f"\n {unique_citation}")
+# for ref_num in unique_citation:
+#     if ref_num<1 or ref_num>len(result):
+#         print(f"\nWarning: invalid Citation {ref_num} only {len(result)} references were retrieved")
+# print(f"\nAll Citations number in the Claims are valid: {unique_citation}")    
+if not unique_citation:
+    print("Warning: No citations found in the answer.")
+else:
+    invalid_citations = [
+        ref_num for ref_num in unique_citation
+        if ref_num < 1 or ref_num > len(result)
+    ]
+
+    if invalid_citations:
+        print(f"Warning: Invalid citations: {invalid_citations}")
+    else:
+        print(f"All citation numbers are valid: {unique_citation}")    
 #source attribution after in retrieved references section provide the chunk index, reference number and source and preview
 print("\nRetrieved references")
 for reference_num, (source,i,content,distance) in enumerate(result,start=1):

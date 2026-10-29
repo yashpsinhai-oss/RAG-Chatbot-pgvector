@@ -31,7 +31,7 @@ if __name__=="__main__":
     result=search_chunks(query)
     chunk_text=[]
     for content in result:
-        print(content) #for debugging
+        # print(content) #for debugging
         chunk_text.append(content[2])            
     
     join_text = "\n".join(chunk_text)     # one string for the whole retrieved chunks from DB
