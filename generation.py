@@ -44,6 +44,13 @@ def generate_answer(query,join_text):
     - Do not rely on a citation at the end of a paragraph or a later sentence to support an earlier sentence.
     - If a factual sentence is not directly supported by the CONTEXT, do not present it as an established fact.
     - Do not invent reference numbers, sources, or supporting evidence.
+    - Every factual statement must have its supporting
+    reference number immediately after the statement.
+
+    -This also applies to introductory statements before
+    bullet points or numbered lists.
+
+    -Do not leave factual introductory statements uncited.
 
     3. **Grounding and accuracy:**
     - Do not infer details that are not explicitly supported by the retrieved CONTEXT.

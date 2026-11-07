@@ -245,6 +245,7 @@ if __name__=="__main__":
     if validation_mode == "1":
         # Individual claim validation
         #extracting individual claims and citations from the python dict
+        final_verdict = []
         for claim_data in claims_data.get("claims",[]):
             claim=claim_data.get("claim")
             citations = claim_data.get("citations",[])
@@ -254,6 +255,14 @@ if __name__=="__main__":
                 print("Citations: None")
                 print("Evidence: No cited evidence found")
                 print("Status: UNCITED")
+
+                # your UNCITED claims also need to be included in the final output.
+                final_verdict.append({
+                "claim": claim,
+                "citations": [],
+                "status": "UNCITED",
+                "explanation": "No citations were provided for this claim."
+                })
                 continue
             #retrieving corresponding chunks
             cited_chunks,invalid_citation=get_cited_chunks(citations,result)
@@ -268,8 +277,7 @@ if __name__=="__main__":
             #creating verdict by adding claim and citation to dictionary or we can create final verdict similar to batch claim
             verdict["claim"] = claim
             verdict["citations"] = citations
-            status=verdict.get("status")
-            explanation=verdict.get("explanation")
+            final_verdict.append(verdict)
         pass
 
     elif validation_mode == "2":
@@ -283,4 +291,4 @@ if __name__=="__main__":
 
     print("\nFinal Validation Results:")    
     #converts python dict to json string
-    print(json.dumps(verdict,indent=4))
+    print(json.dumps(final_verdict,indent=4))

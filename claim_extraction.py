@@ -56,6 +56,18 @@ def extract_claims(answer):
 
     15. If a sentence has no citation, return an empty citations list.
 
+    16. A citation appearing at the end of a sentence applies
+    to all factual claims extracted from that sentence,
+    including claims created by splitting it.
+
+    17. Do not inherit citations from separate sentences,
+    headings, or bullet points.
+
+    18. For an introductory statement followed by bullet points,
+    do not automatically inherit citations from the bullet points.
+    Only use citations explicitly associated with the
+    introductory statement.
+
     CONTEXT:{answer}
     """
     response=client.chat.completions.create(
