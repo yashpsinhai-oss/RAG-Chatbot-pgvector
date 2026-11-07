@@ -3,3 +3,5 @@
 __pycache__/
 *.pyc
 data/
+generation.txt
+evidence_validation.txt
