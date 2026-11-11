@@ -682,6 +682,10 @@ The following checklist covers important pipeline behaviours and regression scen
 - [ ] Introduce automated evaluation datasets and regression tests.
 - [ ] Build an interface for inspecting answers, citations, evidence, and validation results.
 - [ ] Explore agentic RAG capabilities such as query decomposition, iterative retrieval, and adaptive retrieval.
+- [ ] Compare validation prompt versions using identical claims and cited evidence.
+- [ ] Compare individual and batch validation for consistency, latency, and API usage.
+- [ ] Evaluate citation precision, claim coverage, and evidence faithfulness.
+- [ ] Build a repeatable evaluation dataset with expected claim-level verdicts.
 
 ---
 
