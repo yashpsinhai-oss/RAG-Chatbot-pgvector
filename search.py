@@ -23,7 +23,7 @@ def search_chunks(query):
                 if(chunk[3]>=0.45):
                     continue
                 similarity_threshold_chunk.append(chunk)
-            return similarity_threshold_chunk    
+            return similarity_threshold_chunk
 
 if __name__=="__main__":
     query="How does JWT Authentication work?"

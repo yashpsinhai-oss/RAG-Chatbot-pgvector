@@ -1,0 +1,143 @@
+[
+    {
+        "claim": "JWT authentication works by replacing server\u2011side session storage with a self\u2011contained, signed token that the client presents on each request",
+        "citations": [],
+        "status": "UNCITED",
+        "explanation": "No citations were provided for this claim."
+    },
+    {
+        "status": "SUPPORTED",
+        "explanation": "Reference [3] explicitly states: \"Send a POST /login request with username & password in the body.\" This directly confirms that the client sends a POST /login request that includes a username and password in the request body, fully supporting the claim.",
+        "claim": "The client sends a POST\u202f/login request that includes a username and password in the request body",
+        "citations": [
+            3
+        ]
+    },
+    {
+        "status": "UNSUPPORTED",
+        "explanation": "Neither Reference [2] nor Reference [3] contains an explicit statement that the server checks the credentials. Reference [2] discusses JWT structure and token usage, while Reference [3] describes sending a POST /login request with username and password and obtaining a token, but it does not directly state that the server validates those credentials. Because the claim is not directly established by the cited evidence, it is unsupported.",
+        "claim": "The server checks the credentials",
+        "citations": [
+            2,
+            3
+        ]
+    },
+    {
+        "status": "UNSUPPORTED",
+        "explanation": "Reference [2] describes how a JWT is formed (JSON data + encryption -> token -> JWT) and outlines its structure, but it does not state that a JWT is created only when something is valid. Reference [3] explains token generation per user, how to validate a token, and how to use the token for authentication, but it likewise does not assert that a JWT is created as a result of a validity check. Neither citation provides explicit evidence that \"if they are valid, it creates a JSON Web Token (JWT)\". Therefore the claim is not supported by the provided references.",
+        "claim": "if they are valid, it creates a JSON\u202fWeb\u202fToken (JWT)",
+        "citations": [
+            2,
+            3
+        ]
+    },
+    {
+        "status": "SUPPORTED",
+        "explanation": "Reference [2] describes the JWT header, stating that the 'alg' field in the header indicates the signing algorithm and lists examples such as HS256 for symmetric cryptography and RS256/ES256 for asymmetric cryptography. This directly confirms that the header identifies the signing algorithm as claimed.",
+        "claim": "The header identifies the signing algorithm (e.g., HS256 for symmetric cryptography or RS256/ES256 for asymmetric cryptography)",
+        "citations": [
+            2
+        ]
+    },
+    {
+        "status": "SUPPORTED",
+        "explanation": "Reference [1] explicitly states that the token (i.e., its payload) contains fields such as id, name, issue date, and expiry date, directly supporting the claim that the payload holds user\u2011specific claims of an identifier, name, issue date, and expiry date.",
+        "claim": "The payload contains user\u2011specific claims such as an identifier, name, issue date, and expiry date",
+        "citations": [
+            1
+        ]
+    },
+    {
+        "status": "UNSUPPORTED",
+        "explanation": "Reference [2] only lists HS256 as a symmetric algorithm and RS256 as an asymmetric algorithm but does not state that the JWT signature is computed over the header and payload using a secret key for HS256 or a private key for RS256. Reference [3] describes generating a secret key and using it with HMAC for token creation, but it does not explicitly describe the signing process as covering the header and payload, nor does it mention RS256 signing with a private key. Because the cited references do not directly establish the claimed computation of the signature, the claim is not supported.",
+        "claim": "The signature is computed over the header and payload using a secret key (for HS256) or a private key (for RS256)",
+        "citations": [
+            2,
+            3
+        ]
+    },
+    {
+        "status": "SUPPORTED",
+        "explanation": "Reference [3] explicitly states that a secret key should be generated once (\"Run this once to print out a Base64-encoded secret key\"), that the key is Base64-encoded (\"Base64-encoded secret key\"), and that the resulting string should be pasted into the service's configuration (\"paste that string into secretKey in JwtService\"). These statements directly confirm each part of the claim.",
+        "claim": "A secret key is generated once, encoded in Base64, and stored (e.g., in the service\u2019s configuration)",
+        "citations": [
+            3
+        ]
+    },
+    {
+        "status": "UNSUPPORTED",
+        "explanation": "Reference [3] describes generating a Base64\u2011encoded secret key, storing it in JwtService, and using getSignInKey() to obtain a SecretKey for signing the JWT. It also mentions a later \"Validating the Token\" step, but it does not explicitly state that the same secret key (or a matching public key) is used in the verification of the token's signature. Because the cited text does not directly establish that the same key is employed for verification, the claim is not supported by the provided evidence.",
+        "claim": "The same key (or the matching public key) is later used to verify the token\u2019s signature",
+        "citations": [
+            3
+        ]
+    },
+    {
+        "status": "PARTIALLY_SUPPORTED",
+        "explanation": "Reference [3] shows that after a successful login the server returns a token in the response payload, which the client can copy and use for subsequent requests (evidence of the JWT being returned to the client). However, the reference does not explicitly state that the client stores the token in memory or local storage; it only describes copying the token for use. Therefore, the claim is only partially supported.",
+        "claim": "The signed JWT is returned to the client, which stores it (e.g., in memory or local storage)",
+        "citations": [
+            3
+        ]
+    },
+    {
+        "status": "SUPPORTED",
+        "explanation": "Reference [3] explicitly describes calling a protected endpoint by selecting 'Bearer Token' in the Authorization tab and pasting the JWT, which indicates that the client includes the JWT in the HTTP Authorization header using the Bearer scheme for protected requests.",
+        "claim": "For each protected request, the client places the JWT in the HTTP\u202fAuthorization header using the Bearer scheme",
+        "citations": [
+            3
+        ]
+    },
+    {
+        "status": "UNSUPPORTED",
+        "explanation": "The cited references describe what a JWT is, why it is used, its structure, and analogies about presenting a token, but they do not contain any statement that a receiving service extracts the token. No evidence directly supports the claim that a receiving service extracts the token.",
+        "claim": "The receiving service extracts the token",
+        "citations": [
+            1,
+            2
+        ]
+    },
+    {
+        "status": "UNSUPPORTED",
+        "explanation": "The cited references describe JWT usage, the risk of token forgery, and list possible signature algorithms (symmetric HS256 and asymmetric RS256/ES256). However, they do not explicitly state that a signature is verified using a known secret or public key. Since the claim that the signature is verified with the known secret/public key is not directly established by the provided evidence, it is unsupported.",
+        "claim": "verifies the signature with the known secret/public key",
+        "citations": [
+            1,
+            2
+        ]
+    },
+    {
+        "status": "UNSUPPORTED",
+        "explanation": "The cited references describe that a token (e.g., a JWT) can contain fields such as an expiry date (Reference [1]) and discuss token structure (Reference [2]), but none of the provided evidence explicitly states that the token or system \"checks\" standard claims like expiration. The claim that expiration is checked is not directly supported by the given references.",
+        "claim": "checks standard claims such as expiration",
+        "citations": [
+            1,
+            2
+        ]
+    },
+    {
+        "status": "UNSUPPORTED",
+        "explanation": "The cited references describe JWTs as tokens that can replace session IDs and note that the token must be trustworthy and verifiable. While this implies that a verified token can authenticate a request, the references never explicitly state that successful verification treats the request as authenticated without any server\u2011side session record. Thus the claim is not directly supported by the provided evidence.",
+        "claim": "if verification succeeds, treats the request as authenticated without needing a server\u2011side session record",
+        "citations": [
+            1,
+            2
+        ]
+    },
+    {
+        "status": "UNSUPPORTED",
+        "explanation": "Reference [2] discusses that a JWT token must be trustworthy and verifiable and lists signing algorithms (symmetric HS256, asymmetric RS256/ES256). However, it does not explicitly state that the token can be validated independently by any service that trusts the same signing key. The claim adds a specific condition about independent validation by any service sharing the signing key, which is not directly established by the cited text.",
+        "claim": "the token can be validated independently by any service that trusts the same signing key",
+        "citations": [
+            2
+        ]
+    },
+    {
+        "status": "SUPPORTED",
+        "explanation": "Reference [2] explicitly states that in a real\u2011world Single Sign\u2011On (SSO) scenario, a token obtained from one login (e.g., Gmail) can be used to log in to other applications of the same provider (e.g., other Google apps) without re\u2011authenticating. Since the document defines the token as a JWT, this directly confirms that the same JWT can be used for SSO across multiple applications belonging to the same provider.",
+        "claim": "the same JWT can be used for single sign\u2011on across multiple applications of the same provider",
+        "citations": [
+            2
+        ]
+    }
+]

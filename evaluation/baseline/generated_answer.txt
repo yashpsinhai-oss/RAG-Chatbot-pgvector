@@ -1,0 +1,13 @@
+JWT authentication works by replacing server‑side session storage with a self‑contained, signed token that the client presents on each request.
+
+1. **Initial login** – The client sends a POST /login request that includes a username and password in the request body【3】.  
+2. **Credential verification and token creation** – The server checks the credentials; if they are valid, it creates a JSON Web Token (JWT)【2】【3】.  
+3. **JWT structure** –  
+   • The **header** identifies the signing algorithm (e.g., HS256 for symmetric cryptography or RS256/ES256 for asymmetric cryptography)【2】.  
+   • The **payload** contains user‑specific claims such as an identifier, name, issue date, and expiry date【1】.  
+   • The **signature** is computed over the header and payload using a secret key (for HS256) or a private key (for RS256)【2】【3】.  
+4. **Secret‑key handling** – A secret key is generated once, encoded in Base64, and stored (e.g., in the service’s configuration). The same key (or the matching public key) is later used to verify the token’s signature【3】.  
+5. **Token delivery** – The signed JWT is returned to the client, which stores it (e.g., in memory or local storage)【3】.  
+6. **Subsequent requests** – For each protected request, the client places the JWT in the HTTP Authorization header using the Bearer scheme【3】.  
+7. **Server‑side validation** – The receiving service extracts the token, verifies the signature with the known secret/public key, checks standard claims such as expiration, and, if verification succeeds, treats the request as authenticated without needing a server‑side session record【1】【2】.  
+8. **SSO benefit** – Because the token can be validated independently by any service that trusts the same signing key, the same JWT can be used for single sign‑on across multiple applications of the same provider【2】.  

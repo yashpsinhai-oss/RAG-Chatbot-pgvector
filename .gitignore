@@ -5,3 +5,5 @@ __pycache__/
 data/
 generation.txt
 evidence_validation.txt
+# Ignore generated evaluation runs
+evaluation/run_*/

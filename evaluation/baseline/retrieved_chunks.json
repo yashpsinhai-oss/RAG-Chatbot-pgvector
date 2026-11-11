@@ -1,0 +1,23 @@
+[
+    {
+        "reference_number": 1,
+        "source": "jwt_notes.pdf",
+        "chunk_index": 0,
+        "content": "1. Why JWT? The problem with sessions: every time you log in, the server creates a session and gives you back a session ID (e.g. 102 -> session id ). As long as you hold that ID, you don\u2019t need to log in again and again \u2013 but constantly re-authenticating everywhere isn\u2019t always good , especially across different services. Coffee shop analogy: - Yash pays $50 for a subscription at a coffee shop (Bob). - In return, he gets an id/token for that subscription \u2013 containing things like id , name , issue date , expiry date . - Next time (say, Mahesh), he just shows this token/id to get coffee \u2013 no need to pay or re-verify from scratch each time. - Risk: if someone fakes/copies this token , they could also get coffee with it \u2013 so the token itself needs to be trustworthy and verifiable. Representing this",
+        "distance": 0.2829450223672736
+    },
+    {
+        "reference_number": 2,
+        "source": "jwt_notes.pdf",
+        "chunk_index": 1,
+        "content": "each time. - Risk: if someone fakes/copies this token , they could also get coffee with it \u2013 so the token itself needs to be trustworthy and verifiable. Representing this token as data: - We could use XML , but XML is bulky, and encrypting it produces an even bulkier output. - Alternative: JSON \u2013 lightweight, and compresses better after encryption. - So: data (as JSON) + encryption -> Token -> JWT . Real-world use \u2013 Single Sign-On (SSO): using a token from one login (e.g. Gmail), you can log in to other apps of the same provider (e.g. other Google apps) without logging in again \u2013 this is Single Sign-On (SSO) . 2. Structure of a JWT A JWT has 3 parts: 1 1 Header alg can be: Symmetric Cryptography \u2013 e.g. HS256 Asymmetric Cryptography (private/public key) \u2013 e.g. RS256 / ES256 2 2 Payload: DATA { \"alg\" :",
+        "distance": 0.30066300847957117
+    },
+    {
+        "reference_number": 3,
+        "source": "jwt_notes.pdf",
+        "chunk_index": 7,
+        "content": "\u201ctoken\u201d \u2013 that would be the same token for every user , which would be a major security hole. The token must be generated per-user via generateT oken(username) . Generating your own secret key Run this once to print out a Base64-encoded secret key, then paste that string into secretKey in JwtService . getSignInKey() then decodes that Base64 string back into raw bytes ( Decoders.BASE64.decode(...) ) and converts those bytes into a proper SecretKey object using Keys.hmacShaKeyFor(...) . 8. Testing Login + Token Generation in Postman 1. Send a POST /login request with username & password in the body. 2. Copy the generated token from the response payload. 3. To call a protected endpoint (e.g. /students ), go to the Authorization tab, choose Bearer Token , and paste the token in. 4. Click send \u2013 you\u2019re now authenticated using the JWT instead of Basic Auth. 9. Validating the Token \u2013",
+        "distance": 0.3035568837734506
+    }
+]

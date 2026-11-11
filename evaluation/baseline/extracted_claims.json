@@ -1,0 +1,111 @@
+{
+    "claims": [
+        {
+            "claim": "JWT authentication works by replacing server\u2011side session storage with a self\u2011contained, signed token that the client presents on each request",
+            "citations": []
+        },
+        {
+            "claim": "The client sends a POST\u202f/login request that includes a username and password in the request body",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "The server checks the credentials",
+            "citations": [
+                2,
+                3
+            ]
+        },
+        {
+            "claim": "if they are valid, it creates a JSON\u202fWeb\u202fToken (JWT)",
+            "citations": [
+                2,
+                3
+            ]
+        },
+        {
+            "claim": "The header identifies the signing algorithm (e.g., HS256 for symmetric cryptography or RS256/ES256 for asymmetric cryptography)",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "The payload contains user\u2011specific claims such as an identifier, name, issue date, and expiry date",
+            "citations": [
+                1
+            ]
+        },
+        {
+            "claim": "The signature is computed over the header and payload using a secret key (for HS256) or a private key (for RS256)",
+            "citations": [
+                2,
+                3
+            ]
+        },
+        {
+            "claim": "A secret key is generated once, encoded in Base64, and stored (e.g., in the service\u2019s configuration)",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "The same key (or the matching public key) is later used to verify the token\u2019s signature",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "The signed JWT is returned to the client, which stores it (e.g., in memory or local storage)",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "For each protected request, the client places the JWT in the HTTP\u202fAuthorization header using the Bearer scheme",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "The receiving service extracts the token",
+            "citations": [
+                1,
+                2
+            ]
+        },
+        {
+            "claim": "verifies the signature with the known secret/public key",
+            "citations": [
+                1,
+                2
+            ]
+        },
+        {
+            "claim": "checks standard claims such as expiration",
+            "citations": [
+                1,
+                2
+            ]
+        },
+        {
+            "claim": "if verification succeeds, treats the request as authenticated without needing a server\u2011side session record",
+            "citations": [
+                1,
+                2
+            ]
+        },
+        {
+            "claim": "the token can be validated independently by any service that trusts the same signing key",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "the same JWT can be used for single sign\u2011on across multiple applications of the same provider",
+            "citations": [
+                2
+            ]
+        }
+    ]
+}
