@@ -671,11 +671,16 @@ The following checklist covers important pipeline behaviours and regression scen
 - [ ] Extend `run_metadata.json` with prompt versions, model settings, and retrieval configuration.
 - [ ] Preserve exact prompt text for reproducibility.
 - [ ] Further improve citation-to-evidence alignment.
+- [ ] Fix invalid citation handling.
+- [ ] Complete batch evidence validation.
+- [ ] Finalize and freeze the evidence validation prompt.
+- [ ] Run evaluation against a consistent set of questions and claims.
 - [ ] Evaluate strictness against unsupported inferences.
 - [ ] Compare individual and batch validation.
 - [ ] Develop automated comparison of prompt versions.
 - [ ] Introduce quantitative evaluation metrics for citation accuracy and claim faithfulness.
 - [ ] Experiment with different Top-K and similarity-threshold configurations.
+- [ ] Experiment with additional chunking strategies.
 - [ ] Explore hybrid search and reranking.
 - [ ] Introduce automated evaluation datasets and regression tests.
 - [ ] Build an interface for inspecting answers, citations, evidence, and validation results.
