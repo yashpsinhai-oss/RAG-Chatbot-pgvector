@@ -111,12 +111,10 @@ rag-chatbot-pgvector/
 ├── search.py                       # Semantic retrieval
 │
 ├── generation.py                   # Answer generation
-├── generation.txt                  # Generation prompt/reference
 │
 ├── claim_extraction.py             # Claim and citation extraction
 │
 ├── evidence_validation.py          # Citation and evidence validation
-├── evidence_validation.txt         # Validation prompt/reference
 │
 ├── db_check_v1_PC10.py             # Database verification
 ├── db_check_v2_PC10.py
