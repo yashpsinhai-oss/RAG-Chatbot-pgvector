@@ -1,12 +1,19 @@
 import os
 import re
 import sys
+import json
 from dotenv import load_dotenv
 from groq import Groq
 from search import search_chunks
+from pathlib import Path
+from datetime import datetime
+
 load_dotenv()
 client=Groq(api_key=os.getenv("GROQ_API_KEY"))
 
+#saving the prompt version and the exact prompt text along with query and attribution
+EXPERIMENT_VERSION = "v1"  #identifies the pipeline configuration
+GENERATION_PROMPT_VERSION = "v1"  #identifies the generation prompt
 def prepare_attribution(result):
     combine_chunks=[]
     #now before sending our joined text to the prompt add citations that this text belongs to reference 1,2,3....
@@ -88,7 +95,9 @@ def generate_answer(query,join_text):
     # print("ANSWER CONTAINS [1, 2, 3]:", "[1, 2, 3]" in answer)
     # print("ANSWER END:", repr(answer[-200:]))
     # print(answer)
-    return answer
+
+    #this function should only generate answer and not the prompt version and text so we can provide that to main which will save it
+    return prompt,answer
 
 def reference_id_validation(answer):
     #now citation validation step-1 (reference id validation-matching whether all the citation num generated in answer is from the Retrieved Reference Numbers section)
@@ -138,14 +147,50 @@ def source_attribution(result):
 
 
 if __name__=="__main__":
+    #to get run-specific folders and output filenames
+    experiment_dir = Path("evaluation") / EXPERIMENT_VERSION
+    experiment_dir.mkdir(parents=True, exist_ok=True)
+
+    run_number = 1
+
+    while (experiment_dir / f"run_{run_number:03d}").exists():
+        run_number += 1
+
+    run_id = f"run_{run_number:03d}"
+    run_dir = experiment_dir / run_id
+    run_dir.mkdir()
+
+    generate_dir=run_dir/"generation"
+    generate_dir.mkdir()
+
     query=input("Ask your question: ")
+    run_metadata = {
+        "experiment_version": EXPERIMENT_VERSION,
+        "run_id": run_id,
+        "query": query,
+        "generation_prompt_version": GENERATION_PROMPT_VERSION
+    }
+    with open(run_dir/"run_metadata.json", "w", encoding="utf-8") as file:
+        json.dump(run_metadata,file,indent=4)
     result=search_chunks(query)
     if not result:
         print("More context is needed.")
         sys.exit()
     join_attribution_text=prepare_attribution(result)
     print(join_attribution_text)
-    answer=generate_answer(query,join_attribution_text)
+
+    #return the prompt also from the generate answer function and save it in main
+    prompt,answer=generate_answer(query,join_attribution_text)
+
+    # save the prompt text
+    with open(generate_dir/f"generation_prompt_{GENERATION_PROMPT_VERSION}.txt","w",encoding="utf-8") as file:
+        file.write(prompt)
+        
+    #wont work on running validator since we import generation and use generate_answer in evidence_validator main which will not execute this part , so we write in that same file(validator) the same code
+    
+    # 3. Save generated answer
+    with open(run_dir/"generated_answer.txt", "w", encoding="utf-8") as file:
+        file.write(answer)
     print(answer)
     citation=reference_id_validation(answer)
     print(citation)

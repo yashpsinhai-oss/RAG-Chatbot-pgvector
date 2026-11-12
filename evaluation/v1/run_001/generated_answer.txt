@@ -1,0 +1,13 @@
+1. When a user submits credentials (e.g., via a **POST /login** request), the server verifies them and, if they are valid, creates a JWT that contains user‑specific data such as an identifier, name, issue date, and expiry date【1】【3】.  
+
+2. The JWT is assembled as JSON and then **signed** using an algorithm specified in the header—either a symmetric key algorithm like **HS256** or an asymmetric key algorithm like **RS256** or **ES256**【2】.  
+
+3. A distinct token is generated for each user by invoking a function such as **generateToken(username)**, ensuring that the same token is not reused across users【3】.  
+
+4. The signed token is returned to the client in the login response payload【3】.  
+
+5. The client stores the token and includes it in the **Authorization** header of subsequent requests using the **Bearer** scheme (e.g., `Authorization: Bearer <token>`)【3】.  
+
+6. For each protected request, the server extracts the token, validates its signature with the same secret (decoded from a Base64‑encoded string) or public key, checks claims such as expiration, and, when the token is valid, treats the request as authenticated without requiring another login【3】.  
+
+7. Because the token is self‑contained and verifiable, it can be used for **Single Sign‑On (SSO)** across services that share the verification key, allowing a user to access multiple applications after a single login【2】.
