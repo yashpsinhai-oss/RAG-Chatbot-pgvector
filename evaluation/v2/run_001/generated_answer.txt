@@ -1,0 +1,20 @@
+**How JWT authentication works (based on the provided notes)**  
+
+1. **Login and token creation** – After a user supplies valid credentials, the server generates a token that includes the user’s identifier, name, issue date, and expiry date [1].  
+
+2. **Token format** – The token is built as JSON and signed (or encrypted) into three parts:  
+   * a **header** that specifies the signing algorithm,  
+   * a **payload** that carries the user data, and  
+   * a **signature** that protects the token from tampering [2].  
+
+3. **Signing algorithm** – The header can indicate a symmetric algorithm such as **HS256** or an asymmetric algorithm such as **RS256** or **ES256** [2].  
+
+4. **Key handling** – For symmetric signing, the server uses a secret key that can be generated once (e.g., a Base64‑encoded key decoded and turned into a `SecretKey` object) [3].  
+
+5. **Returning the token** – The server sends the generated JWT back to the client. The client stores the token (e.g., in memory or local storage) and includes it in the `Authorization: Bearer <token>` header of subsequent requests [3].  
+
+6. **Token validation on each request** – When a protected endpoint receives a request, it extracts the JWT, verifies the signature with the known secret (or public key), and checks claims such as the expiry time to ensure the token is still valid [3].  
+
+7. **Authenticated access** – If the signature and claims are valid, the server trusts the information in the payload and processes the request as an authenticated user, without needing a server‑side session store [3].  
+
+*Result:* JWT authentication replaces traditional session IDs with self‑contained, signed tokens that can be verified on each request, enabling stateless authentication and scenarios such as single sign‑on [2].

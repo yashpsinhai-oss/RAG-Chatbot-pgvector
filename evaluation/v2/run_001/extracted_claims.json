@@ -1,0 +1,130 @@
+{
+    "claims": [
+        {
+            "claim": "After a user supplies valid credentials, the server generates a token.",
+            "citations": [
+                1
+            ]
+        },
+        {
+            "claim": "The token includes the user\u2019s identifier, name, issue date, and expiry date.",
+            "citations": [
+                1
+            ]
+        },
+        {
+            "claim": "The token is built as JSON.",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "The token is signed (or encrypted) into three parts.",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "A header specifies the signing algorithm.",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "A payload carries the user data.",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "A signature protects the token from tampering.",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "The header can indicate a symmetric algorithm such as HS256 or an asymmetric algorithm such as RS256 or ES256.",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "For symmetric signing, the server uses a secret key that can be generated once (e.g., a Base64\u2011encoded key decoded and turned into a `SecretKey` object).",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "The server sends the generated JWT back to the client.",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "The client stores the token (e.g., in memory or local storage) and includes it in the `Authorization: Bearer <token>` header of subsequent requests.",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "When a protected endpoint receives a request, it extracts the JWT.",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "When a protected endpoint receives a request, it verifies the signature with the known secret (or public key).",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "When a protected endpoint receives a request, it checks claims such as the expiry time to ensure the token is still valid.",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "If the signature and claims are valid, the server trusts the information in the payload.",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "If the signature and claims are valid, the server processes the request as an authenticated user.",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "If the signature and claims are valid, the server does not need a server\u2011side session store.",
+            "citations": [
+                3
+            ]
+        },
+        {
+            "claim": "JWT authentication replaces traditional session IDs with self\u2011contained, signed tokens.",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "Self\u2011contained, signed tokens can be verified on each request.",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "JWT authentication enables stateless authentication.",
+            "citations": [
+                2
+            ]
+        },
+        {
+            "claim": "JWT authentication enables scenarios such as single sign\u2011on.",
+            "citations": [
+                2
+            ]
+        }
+    ]
+}

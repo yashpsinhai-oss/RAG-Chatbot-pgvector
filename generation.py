@@ -164,6 +164,7 @@ if __name__=="__main__":
     generate_dir.mkdir()
 
     query=input("Ask your question: ")
+    #saving the metadata for each run and prompt version, experiement version,query
     run_metadata = {
         "experiment_version": EXPERIMENT_VERSION,
         "run_id": run_id,

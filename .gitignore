@@ -7,4 +7,3 @@ generation.txt
 evidence_validation.txt
 # Ignore generated evaluation runs
 evaluation/run_*/
-evaluation/v*/
