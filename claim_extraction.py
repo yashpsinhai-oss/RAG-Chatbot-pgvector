@@ -9,6 +9,7 @@ import search
 
 EXPERIMENT_VERSION="v2"
 EXTRACTION_PROMPT_VERSION="v1"
+EXTRACTION_MODEL_NAME="openai/gpt-oss-120b"
 load_dotenv()
 client=Groq(api_key=os.getenv("GROQ_API_KEY"))
 
@@ -79,7 +80,7 @@ def extract_claims(answer):
     #seems like the issue of prompt used for generated answer citation claim association in generation
 
     response=client.chat.completions.create(
-        model="openai/gpt-oss-120b",
+        model=EXTRACTION_MODEL_NAME,
         messages=[{"role":"user","content":prompt}],
         response_format={"type": "json_object"}
     )

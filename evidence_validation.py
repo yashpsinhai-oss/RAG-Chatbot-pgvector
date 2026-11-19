@@ -13,6 +13,10 @@ import groq
 load_dotenv()
 client=Groq(api_key=os.getenv("GROQ_API_KEY"))
 
+EXPERIMENT_VERSION="v4"
+VALIDATION_MODEL_NAME = "openai/gpt-oss-120b"
+VALIDATION_PROMPT_VERSION="v1"
+
 #retrieve corresponding chunks
 def get_cited_chunks(citations,result):
     invalid_citation=[]
@@ -119,7 +123,7 @@ def validate_claim(claim,citations,evidence):
     for attempt in range(max_retries):
         try:
             response=client.chat.completions.create(
-                model="openai/gpt-oss-120b",
+                model=VALIDATION_MODEL_NAME,
                 messages=[{"role":"user","content":prompt}],
                 response_format={"type":"json_object"}
             )
@@ -134,7 +138,7 @@ def validate_claim(claim,citations,evidence):
     #converts json string to python dict
     verdict=json.loads(response.choices[0].message.content)
 
-    return verdict
+    return prompt,verdict
 
 def validate_batch_claim(result,claims,batch_size=5):
     #outside loop , at the start since this will store the verdict for ach batch then join them
@@ -234,7 +238,7 @@ def validate_batch_claim(result,claims,batch_size=5):
         for attempt in range(max_retries):
             try:
                 response=client.chat.completions.create(
-                    model="openai/gpt-oss-120b",
+                    model=VALIDATION_MODEL_NAME,
                     messages=[{"role":"user","content":prompt}],
                     response_format={"type":"json_object"}
                 )
@@ -286,17 +290,20 @@ if __name__=="__main__":
     "2. Validator-only execution\n"
     )
 
+    experiment_dir=Path("evaluation")/EXPERIMENT_VERSION
+    experiment_dir.mkdir(parents=True,exist_ok=True)
+
     if execution_mode == "2":
 
         run_name = input("Enter existing run folder name: ")
 
-        run_dir = Path("evaluation") / run_name
+        run_dir = experiment_dir / run_name
 
         if not run_dir.exists():
             raise FileNotFoundError(f"Run folder not found: {run_dir}")
 
         cited_evidence_records = load_cited_evidence(run_dir)
-
+        
         print(f"Loaded {len(cited_evidence_records)} claim records.")
 
         # Step 1 — Initialize the verdict list and select the prompt version
@@ -306,6 +313,23 @@ if __name__=="__main__":
             "Enter prompt version (e.g. prompt_v2): "
         )
 
+        validation_dir = run_dir / "validation" / prompt_version
+        validation_dir.mkdir(parents=True, exist_ok=True)
+
+        run_number = 1
+        
+        while (validation_dir / f"run_{run_number:03d}").exists():
+            run_number += 1
+        
+        run_id = f"run_{run_number:03d}"
+        prompt_run_dir = validation_dir / run_id
+        prompt_run_dir.mkdir()
+
+        prompts_dir = prompt_run_dir / "Prompts"
+        prompts_dir.mkdir()
+
+        #saving claim number before claim processing loop - now used index since citations empty or cited_chunks empty then we will use wrong claim number for the file as previous claim number will be continued so no filed created then for 2nd claim it will use 1
+        # claim_number = 1
         # Step 2 — Iterate through the saved claim records
         for index,record in enumerate(cited_evidence_records,start=1):
             claim = record.get("claim")
@@ -330,12 +354,30 @@ if __name__=="__main__":
                 for item in record.get("valid_cited_chunks", [])
             ]
 
+            if not cited_chunks:
+                final_verdict.append({
+                    "claim": claim,
+                    "citations": citations,
+                    "status": "INVALID_CITATION",
+                    "explanation": "No valid cited evidence is available to evaluate this claim."
+                })
+                continue
+
             evidence = prepare_evidence(cited_chunks)
 
             # Step 5 — Call your existing validator
             # Add progress prints
             print("Sending claim to Groq validator...")
-            verdict = validate_claim(claim, citations, evidence)
+            prompt,verdict = validate_claim(claim, citations, evidence)
+            #saving prompt for each claim citation evidence
+                    
+            prompt_file = prompts_dir / f"claim_{index:03d}.txt"
+
+            with open(prompt_file, "w", encoding="utf-8") as file:
+                file.write(prompt)
+
+            # claim_number += 1
+
             # Add progress prints
             print("Validation completed.")
 
@@ -345,11 +387,24 @@ if __name__=="__main__":
             final_verdict.append(verdict)
 
         # Step 6 — Save the new validation output 
-        validation_dir = run_dir / "validation" / prompt_version
-        validation_dir.mkdir(parents=True, exist_ok=False)
-
-        with open(validation_dir / "validator_output.json", "w", encoding="utf-8") as file:
+        with open(prompt_run_dir / "validatoronly_output.json", "w", encoding="utf-8") as file:
             json.dump(final_verdict, file, indent=4)
+
+        #only last prompt is saved , instead save for each prepared prompt from the validate claim fn returned
+        # with open(prompt_run_dir / f"validatoronly_prompt_{prompt_version}.txt", "w", encoding="utf-8") as file:
+        #     file.write(prompt)
+            
+        validationonly_run_metadata={
+            "execution_mode": "validation_only",
+            "source_run_id": run_name,
+            "validation_prompt_version": prompt_version,
+            "model_settings": {
+                "model": VALIDATION_MODEL_NAME
+            },
+            "validation_type": "individual"  #not yet implemented validator only for batch
+        }
+        with open(prompt_run_dir/"validation_metadata.json","w",encoding="utf-8") as file:   
+            json.dump(validationonly_run_metadata,file,indent=4) 
 
         print("\nFinal Validation Results:")
         print(json.dumps(final_verdict, indent=4))
@@ -362,20 +417,44 @@ if __name__=="__main__":
     
     #to get run-specific folders and output filenames
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    run_dir = Path("evaluation") / f"run_{run_id}"
+    run_dir = experiment_dir / f"run_{run_id}"
     run_dir.mkdir(parents=True, exist_ok=False)
 
     query=input("Ask your question: ")
+    threshold=float(input("Similarity Threshold: "))
+    top_k=int(input("Number of Top_K value to be returned: "))
 
     #to save the run id along with query in run_metadata.json
     run_metadata = {
-        "run_id": run_id,
-        "query": query
-    }
+    "execution_mode": "complete_pipeline",
+    "run_id": run_id,
+    "query": query,
+
+    "retrieval_config": {
+        "method": "cosine_distance",
+        "distance_operator": "<=>",
+        "similarity_threshold": threshold,
+        "top_k": top_k
+    },
+
+    "prompt_versions": {
+        "generation": generation.GENERATION_PROMPT_VERSION,
+        "claim_extraction": claim_extraction.EXTRACTION_PROMPT_VERSION,
+        "validation": VALIDATION_PROMPT_VERSION
+    },
+
+    "model_settings": {
+        "generation": generation.GENERATION_MODEL_NAME,
+        "claim_extraction": claim_extraction.EXTRACTION_MODEL_NAME,
+        "validation": VALIDATION_MODEL_NAME
+    },
+
+    "validation_type": "individual" #not yet implemented for batch
+}
     with open(run_dir / "run_metadata.json", "w", encoding="utf-8") as file:
         json.dump(run_metadata, file, indent=4)
 
-    result=search.search_chunks(query)
+    result=search.search_chunks(query,threshold,top_k)
     if not result:
         print("More context is needed.")
         sys.exit()
@@ -396,7 +475,7 @@ if __name__=="__main__":
         json.dump(retrieved_data, file, indent=4)
     join_attribution_text=generation.prepare_attribution(result)  
     print(join_attribution_text)  
-    answer=generation.generate_answer(query,join_attribution_text)
+    prompt,answer=generation.generate_answer(query,join_attribution_text)
 
     # 3. Save generated answer
     with open(run_dir / "generated_answer.txt", "w", encoding="utf-8") as file:
@@ -417,7 +496,17 @@ if __name__=="__main__":
         #extracting individual claims and citations from the python dict
         final_verdict = []
         cited_evidence_records=[]
-        for claim_data in claims_data.get("claims",[]):
+        prompt_version = f"prompt_{VALIDATION_PROMPT_VERSION}"
+
+        validation_dir = run_dir / "validation" / prompt_version
+        validation_dir.mkdir(parents=True, exist_ok=False)
+
+        prompts_dir = validation_dir / "Prompts"
+        prompts_dir.mkdir()
+
+        # claim_number = 1
+        #since when empty citation we skip using continue after adding to final verdict use enumerate and index and use that actual index for filename
+        for index,claim_data in enumerate(claims_data.get("claims",[]),start=1):
             claim=claim_data.get("claim")
             citations = claim_data.get("citations",[])
             # if answer generated by groq does not contain citation for any factual statemnt so UNCITED
@@ -460,10 +549,27 @@ if __name__=="__main__":
             #printing this with every claim when the list of invalid_citation is not empty
             if invalid_citation:
                 print("Invalid citations:", invalid_citation)
+
+            #handling cases where no citation is valid
+            if not cited_chunks:
+                final_verdict.append({
+                    "claim": claim,
+                    "citations": citations,
+                    "status": "INVALID_CITATION",
+                    "explanation": "No valid cited evidence is available to evaluate this claim."
+                })
+                continue
             # preparing evidence using zip
             evidence=prepare_evidence(cited_chunks)
             #validate the claim using LLM comparing the claim with its cited chunk corresponding to citation number
-            verdict=validate_claim(claim,citations,evidence)
+            prompt,verdict=validate_claim(claim,citations,evidence)
+
+            prompt_file = prompts_dir / f"claim_{index:03d}.txt"
+
+            with open(prompt_file, "w", encoding="utf-8") as file:
+                file.write(prompt)
+
+            # claim_number += 1
             #creating verdict by adding claim and citation to dictionary or we can create final verdict similar to batch claim
             verdict["claim"] = claim
             verdict["citations"] = citations
@@ -475,19 +581,13 @@ if __name__=="__main__":
         # with open(run_dir / "validator_output.json", "w", encoding="utf-8") as file:
         #     json.dump(final_verdict, file, indent=4)      
         # saving this into prompt specific changes folder and reusing claims and citations
-        prompt_version = "prompt_v1"
-
-        validation_dir = run_dir / "validation" / prompt_version
-        validation_dir.mkdir(parents=True, exist_ok=False)
-
         with open(validation_dir / "validator_output.json", "w", encoding="utf-8") as file:
             json.dump(final_verdict, file, indent=4)  
         pass
 
     elif validation_mode == "2":
         # Batch claim validation
-        verdict=validate_batch_claim(result,claims_data,5)
-        pass
+        final_verdict=validate_batch_claim(result,claims_data,5)
 
     else:
         print("Invalid validation mode.")

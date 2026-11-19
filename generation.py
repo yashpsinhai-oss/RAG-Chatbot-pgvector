@@ -14,6 +14,7 @@ client=Groq(api_key=os.getenv("GROQ_API_KEY"))
 #saving the prompt version and the exact prompt text along with query and attribution
 EXPERIMENT_VERSION = "v1"  #identifies the pipeline configuration
 GENERATION_PROMPT_VERSION = "v1"  #identifies the generation prompt
+GENERATION_MODEL_NAME="openai/gpt-oss-120b"
 def prepare_attribution(result):
     combine_chunks=[]
     #now before sending our joined text to the prompt add citations that this text belongs to reference 1,2,3....
@@ -85,7 +86,7 @@ def generate_answer(query,join_text):
     """
 
     response=client.chat.completions.create(
-        model="openai/gpt-oss-120b",
+        model=GENERATION_MODEL_NAME,
         messages=[{"role": "user", "content": prompt}]
     )
     answer=response.choices[0].message.content
